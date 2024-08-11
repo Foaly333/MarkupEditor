@@ -31,7 +31,7 @@ public class MarkupWKWebViewConfiguration {
     public var userCssFile: String? = nil
     public var topLevelAttributes = EditableAttributes.standard
     
-    var userScriptFile : String? {
+    public var userScriptFile : String? {
         get{
             self.userScriptFiles.first
         } set(v) {

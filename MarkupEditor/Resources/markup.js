@@ -104,7 +104,7 @@ MU.loadUserFiles = function(scriptFiles, cssFile) {
         _loadUserScriptFile(scriptFile, function() { MU.loadUserFiles(restOfElements,cssFile) });
     }else{
         if (cssFile) {
-            _loadUserScriptFile(scriptFile, function() { _loadUserCSSFile(cssFile) });
+            _loadUserCSSFile(cssFile);
         } else {
             _loadedUserFiles();
         }
