@@ -27,7 +27,7 @@ import Foundation
 /// those settings dynamically later.
 public class MarkupWKWebViewConfiguration {
     
-    public var userScriptFile: String? = nil
+    public var userScriptFiles: [String] = []
     public var userCssFile: String? = nil
     public var topLevelAttributes = EditableAttributes.standard
     

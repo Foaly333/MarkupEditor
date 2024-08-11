@@ -98,17 +98,16 @@ const _setAttributes = function(element, attributes) {
  * nor cssFile are specified, then the 'loadedUserFiles' callback happens anyway,
  * since this ends up driving the loading process further.
  */
-MU.loadUserFiles = function(scriptFile, cssFile) {
-    if (scriptFile) {
+MU.loadUserFiles = function(scriptFiles, cssFile) {
+    if (scriptFiles.count > 0){
+        const [scriptFile, ...restOfElements] = scriptFiles;
+        _loadUserScriptFile(scriptFile, function() { MU.loadUserFiles(restOfElements,cssFile) });
+    }else{
         if (cssFile) {
             _loadUserScriptFile(scriptFile, function() { _loadUserCSSFile(cssFile) });
         } else {
-            _loadUserScriptFile(scriptFile, function() { _loadedUserFiles() });
+            _loadedUserFiles();
         }
-    } else if (cssFile) {
-        _loadUserCSSFile(cssFile);
-    } else {
-        _loadedUserFiles();
     }
 };
 
@@ -549,11 +548,11 @@ class Searcher {
      */
     _xPathTranslateString(str) {
         return str
-            .replaceAll('&', '')
-            .replaceAll("'", '')
-            .replaceAll('"', '')
-            .replaceAll('<', '')
-            .replaceAll('>', '');
+        .replaceAll('&', '')
+        .replaceAll("'", '')
+        .replaceAll('"', '')
+        .replaceAll('<', '')
+        .replaceAll('>', '');
     };
     
     /**
@@ -650,7 +649,7 @@ class Searcher {
         // We found a range in a different container than the selection
         return elementIndex;
     };
-
+    
 };
 
 /**
@@ -847,7 +846,7 @@ class Undoer {
         _redoOperation(this._stack[this._index]);
         _callback('undoSet');
     };
-
+    
 };
 
 /**
@@ -1170,7 +1169,7 @@ class ResizableImage {
             resizableImage._startDimensions = resizableImage.dimensionsFrom(resizableImage._imageElement);
         };
     };
-
+    
     /**
      * Pinch the resizableImage based on the information in the touchCache and the startDx/startDy
      * we captured when pinching started. The touchCache has the two touches that are active.
@@ -1224,7 +1223,7 @@ class ResizableImage {
             undoer.push(undoerData);
         };
     };
-   
+    
     /**
      * Start resize on mousedown in this resizableImage
      */
@@ -1292,7 +1291,7 @@ class ResizableImage {
         resizableImage._imageElement.setAttribute('width', width);
         resizableImage._imageElement.setAttribute('height', height);
     };
-
+    
     /**
      * Select the image element if it's not the same as the current image element.
      *
@@ -1498,9 +1497,9 @@ const _undoerData = function(operation, data, range=null) {
         undoerRange = (sel && (sel.rangeCount > 0)) ? sel.getRangeAt(0).cloneRange() : null;
     }
     return {
-        operation: operation,
-        range: undoerRange,
-        data: data
+    operation: operation,
+    range: undoerRange,
+    data: data
     };
 };
 
@@ -1866,9 +1865,9 @@ MU.editor.addEventListener('touchcancel', function() {
 document.addEventListener('selectionchange', function(ev) {
     if (_muteChanges) {
         ev.preventDefault();
-//        _consoleLog(' (muted selectionchange)')
+        //        _consoleLog(' (muted selectionchange)')
     } else {
-//        _consoleLog('selectionchange')
+        //        _consoleLog('selectionchange')
         _callback('selectionChange');
     };
 });
@@ -1903,8 +1902,8 @@ MU.editor.addEventListener('focus', function(ev) {
     if (!_muteFocusBlur) {
         _selectedID = _findContentEditableID(document.getSelection()?.focusNode);
         _callback('focus');
-    //} else {
-    //    _consoleLog(" (muted focused: " + ev.target.id + ")")
+        //} else {
+        //    _consoleLog(" (muted focused: " + ev.target.id + ")")
     };
     // Always unmute after focus happens, since it should only happen once for
     // the undoer.push operation
@@ -2983,7 +2982,7 @@ const _deleteRange = function(range, rootName) {
     };
     // We have as many empty text nodes as once existed in the range we deleted, and the
     // trailingNode may not be the same or even the nextSibling of leadingNode.
-    // For example, in a range across the leading and trailing text nodes of 
+    // For example, in a range across the leading and trailing text nodes of
     // <p>Hello <b>bold</b> world</p>, we end up with three empty text nodes.
     const sharedParent = leadingNode && trailingNode && (leadingNode.parentNode === trailingNode.parentNode);
     if (leadingWasDeleted && trailingWasDeleted) {
@@ -3429,12 +3428,12 @@ MU.addButton = function(id, parentId, cssClass, label) {
     button.appendChild(document.createTextNode(label));
     button.addEventListener('click', function() {
         _callback(
-            JSON.stringify({
-                'messageType' : 'buttonClicked',
-                'id' : id,
-                'rect' : _getButtonRect(button)
-            })
-        )
+                  JSON.stringify({
+                      'messageType' : 'buttonClicked',
+                      'id' : id,
+                      'rect' : _getButtonRect(button)
+                  })
+                  )
     });
     const div = document.getElementById(parentId);
     if (div) {
@@ -5440,15 +5439,15 @@ const _doListEnter = function(undoable=true, oldUndoerData) {
     _backupSelection();
     if (undoable) {
         const undoerData = _undoerData(
-                                'listEnter',
-                                {
-                                    outerHTML: outerHTML,
-                                    childNodeIndices: childNodeIndices,
-                                    deletedFragment: deletedFragment,
-                                    selWithinListItem: selWithinListItem
-                                },
-                                undoerRange
-                            );
+                                       'listEnter',
+                                       {
+                                       outerHTML: outerHTML,
+                                       childNodeIndices: childNodeIndices,
+                                       deletedFragment: deletedFragment,
+                                       selWithinListItem: selWithinListItem
+                                       },
+                                       undoerRange
+                                       );
         undoer.push(undoerData);
         _restoreSelection();
     }
@@ -6033,7 +6032,7 @@ const _indentListItem = function(existingListItem, existingList) {
     };
     return existingListItem;
 };
-    
+
 /**
  * We are inside of a list and want to outdent the selected item in it.
  * We can only outdent if the list we are in is contained in another list.
@@ -6300,8 +6299,8 @@ const _replaceNodeWithListItem = function(selNode) {
 //MARK: Indenting and Outdenting
 
 const DentType = {
-    Indent: 'Indent',
-    Outdent: 'Outdent'
+Indent: 'Indent',
+Outdent: 'Outdent'
 };
 
 /**
@@ -7019,11 +7018,11 @@ const _restoreSelection = function() {
 
 const _textString = function(node, title="") {
     if (!node) return title + "null"
-    if (node.nodeType === Node.TEXT_NODE) {
-        return title + "[" + node.nodeName + "] \"" + node.textContent + "\""
-    } else {
-        return title + "[" + node.nodeName + "] " + node.outerHTML;
-    }
+        if (node.nodeType === Node.TEXT_NODE) {
+            return title + "[" + node.nodeName + "] \"" + node.textContent + "\""
+        } else {
+            return title + "[" + node.nodeName + "] " + node.outerHTML;
+        }
 }
 
 /**
@@ -7031,7 +7030,7 @@ const _textString = function(node, title="") {
  */
 const _fragmentString = function(fragment, title="") {
     if (!fragment) return title + "null"
-    let div = document.createElement('div');
+        let div = document.createElement('div');
     div.appendChild(fragment.cloneNode(true));
     return title + div.innerHTML;
 };
@@ -7043,7 +7042,7 @@ const _fragmentString = function(fragment, title="") {
  */
 const _rangeString = function(range, title="") {
     if (!range) return title + "\n   null"
-    const startContainer = range.startContainer;
+        const startContainer = range.startContainer;
     const endContainer = range.endContainer;
     let startContainerType, startContainerContent, endContainerType, endContainerContent;
     if (startContainer.nodeType === Node.TEXT_NODE) {
@@ -8188,7 +8187,7 @@ const _setSrc = function(img, src, divId) {
         _makeSelected(img);
     });
     img.addEventListener('error', function() {
-       _callback(JSON.stringify({'messageType' : 'addedImage', 'src' : src, 'divId' : (divId ?? '') }));
+        _callback(JSON.stringify({'messageType' : 'addedImage', 'src' : src, 'divId' : (divId ?? '') }));
     });
     img.addEventListener('load', function() {
         _makeSelected(img);
@@ -10227,7 +10226,7 @@ const _allChildElementsWithNames = function(element, nodeNames, existingElements
     for (let i = 0; i < children.length; i++) {
         let child = children[i];
         if (_isElementNode(child)) {
-           existingElements = _allChildElementsWithNames(child, nodeNames, existingElements);
+            existingElements = _allChildElementsWithNames(child, nodeNames, existingElements);
         };
     };
     return existingElements;

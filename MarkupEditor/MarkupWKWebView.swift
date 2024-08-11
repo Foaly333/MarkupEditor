@@ -69,7 +69,7 @@ public class MarkupWKWebView: WKWebView, ObservableObject {
     ///
     /// The file should be included as a resource of the app that consumes the MarkupEditor. The file
     /// specified here is independent of the userScripts strings. Either, both, or none can be specified.
-    private var userScriptFile: String? { markupConfiguration?.userScriptFile }
+    private var userScriptFiles: [String] { markupConfiguration?.userScriptFiles ?? [] }
     /// A css file provided by the user, loaded when this view `isReady` but before `loadInitialHtml`.
     ///
     /// The file should be included as a resource of the app that consumes the MarkupEditor.
@@ -293,9 +293,12 @@ public class MarkupWKWebView: WKWebView, ObservableObject {
         if let userCssFile, let userCss = url(forResource: userCssFile, withExtension: nil) {
             srcUrls.append(userCss)
         }
-        if let userScriptFile, let userScript = url(forResource: userScriptFile, withExtension: nil) {
-            srcUrls.append(userScript)
+        for userScriptFile in userScriptFiles {
+            if let userScript = url(forResource: userScriptFile, withExtension: nil) {
+                srcUrls.append(userScript)
+            }
         }
+        
         let fileManager = FileManager.default
         // The cacheDir is a "id" subdirectory below the app's cache directory
         // If not supplied, then id will be a UUID().uuidString
@@ -388,10 +391,12 @@ public class MarkupWKWebView: WKWebView, ObservableObject {
     /// specified. The result will be a callback to `loadedUserFiles`, which causes `loadInitialHtml` and the
     /// call to MarkupDelegate.markupLoaded to happen.
     public func loadUserFiles(_ handler: (()->Void)? = nil) {
-        let scriptFile = userScriptFile == nil ? "null": "'\(userScriptFile!)'"
-        let cssFile = userCssFile == nil ? "null" : "'\(userCssFile!)'"
-        evaluateJavaScript("MU.loadUserFiles(\(scriptFile), \(cssFile))") { result, error in
-            handler?()
+        for userScriptFile in userScriptFiles {
+            let scriptFile = "'\(userScriptFile)'"
+            let cssFile = userCssFile == nil ? "null" : "'\(userCssFile!)'"
+            evaluateJavaScript("MU.loadUserFiles(\(scriptFile), \(cssFile))") { result, error in
+                handler?()
+            }
         }
     }
     
