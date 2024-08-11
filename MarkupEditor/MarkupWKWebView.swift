@@ -395,7 +395,9 @@ public class MarkupWKWebView: WKWebView, ObservableObject {
         for userScriptFile in userScriptFiles {
             scriptFiles += "'\(userScriptFile)',"
         }
-        scriptFiles.removeLast()
+        if userScriptFiles.count > 0{
+            scriptFiles.removeLast()
+        }
         scriptFiles += "]"
         let cssFile = userCssFile == nil ? "null" : "'\(userCssFile!)'"
         print("MU.loadUserFiles(\(scriptFiles), \(cssFile))")

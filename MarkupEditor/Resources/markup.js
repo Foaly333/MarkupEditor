@@ -103,8 +103,6 @@ MU.loadUserFiles = function(scriptFiles, cssFile) {
 };
 
 const _loadUserFiles = function(scriptFiles, cssFile) {
-    _loadedUserFiles();
-    return
     if (scriptFiles.length > 0){
         const [scriptFile, ...restOfElements] = scriptFiles;
         _loadUserScriptFile(scriptFile, function() { _loadUserFiles(restOfElements,cssFile) });
