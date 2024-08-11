@@ -391,12 +391,15 @@ public class MarkupWKWebView: WKWebView, ObservableObject {
     /// specified. The result will be a callback to `loadedUserFiles`, which causes `loadInitialHtml` and the
     /// call to MarkupDelegate.markupLoaded to happen.
     public func loadUserFiles(_ handler: (()->Void)? = nil) {
+        var scriptFiles = "["
         for userScriptFile in userScriptFiles {
-            let scriptFile = "'\(userScriptFile)'"
-            let cssFile = userCssFile == nil ? "null" : "'\(userCssFile!)'"
-            evaluateJavaScript("MU.loadUserFiles(\(scriptFile), \(cssFile))") { result, error in
-                handler?()
-            }
+            scriptFiles += "'\(userScriptFile)',"
+        }
+        scriptFiles.removeLast()
+        scriptFiles += "]"
+        let cssFile = userCssFile == nil ? "null" : "'\(userCssFile!)'"
+        evaluateJavaScript("MU.loadUserFiles(\(scriptFiles), \(cssFile))") { result, error in
+            handler?()
         }
     }
     

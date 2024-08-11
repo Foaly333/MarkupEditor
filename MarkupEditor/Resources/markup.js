@@ -103,16 +103,16 @@ MU.loadUserFiles = function(scriptFiles, cssFile) {
 };
 
 const _loadUserFiles = function(scriptFiles, cssFile) {
-    /**if (scriptFiles.length > 0){
+    if (scriptFiles.length > 0){
         const [scriptFile, ...restOfElements] = scriptFiles;
         _loadUserScriptFile(scriptFile, function() { _loadUserFiles(restOfElements,cssFile) });
-    }else{*/
+    }else{
         if (cssFile) {
             _loadUserCSSFile(cssFile);
         } else {
             _loadedUserFiles();
         }
-    //}
+    }
 };
 
 const _loadedUserFiles = function() {
