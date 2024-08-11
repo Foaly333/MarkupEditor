@@ -99,7 +99,7 @@ const _setAttributes = function(element, attributes) {
  * since this ends up driving the loading process further.
  */
 MU.loadUserFiles = function(scriptFiles, cssFile) {
-    if (scriptFiles.count > 0){
+    if (scriptFiles.length > 0){
         const [scriptFile, ...restOfElements] = scriptFiles;
         _loadUserScriptFile(scriptFile, function() { MU.loadUserFiles(restOfElements,cssFile) });
     }else{
