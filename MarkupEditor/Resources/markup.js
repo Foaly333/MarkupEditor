@@ -102,16 +102,16 @@ MU.loadUserFiles = function(scriptFiles, cssFile) {
     _loadUserFiles(scriptFiles,cssFile);
 };
 
-const _loadUserFiles = function(scriptFiles, cssFile) {
+MU.loadUserCSSTag = function(cssTag) {
+    _loadUserCSSTag(cssTag);
+};
+
+const _loadUserFiles = function(scriptFiles, cssFile,cssTag) {
     if (scriptFiles.length > 0){
         const [scriptFile, ...restOfElements] = scriptFiles;
         _loadUserScriptFile(scriptFile, function() { _loadUserFiles(restOfElements,cssFile) });
     }else{
-        if (cssFile) {
-            _loadUserCSSFile(cssFile);
-        } else {
-            _loadedUserFiles();
-        }
+        _loadUserCSSFile(cssFile,cssTag);
     }
 };
 
@@ -134,14 +134,26 @@ const _loadUserScriptFile = function(file, callback) {
 /**
  * Called to load user CSS before loading html if userCSSFile has been defined for this MarkupWKWebView
  */
-const _loadUserCSSFile = function(file) {
+const _loadUserCSSFile = function(file,tag) {
+    _loadUserCSSTag(tag)
+    if(file){
+        let head = document.getElementsByTagName('head')[0];
+        let link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.addEventListener('load', function() { _loadedUserFiles() });
+        link.href = file;
+        head.appendChild(link);
+    }else{
+        _loadedUserFiles()
+    }
+};
+
+const _loadUserCSSTag = function(tag) {
     let head = document.getElementsByTagName('head')[0];
-    let link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    link.addEventListener('load', function() { _loadedUserFiles() });
-    link.href = file;
-    head.appendChild(link);
+    let style = document.createElement('style');
+    style.text = tag
+    head.appendChild(style);
 };
 
 /**

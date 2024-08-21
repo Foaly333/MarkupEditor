@@ -74,6 +74,8 @@ public class MarkupWKWebView: WKWebView, ObservableObject {
     ///
     /// The file should be included as a resource of the app that consumes the MarkupEditor.
     private var userCssFile: String? { markupConfiguration?.userCssFile }
+    /// The file should be included as a resource of the app that consumes the MarkupEditor.
+    private var userCssTag: String? { markupConfiguration?.userCssTag }
     // Doesn't seem like any way around holding on to markupDelegate here, as forced by drop support
     private var markupDelegate: MarkupDelegate?
     /// Track whether a paste action has been invoked so as to avoid double-invocation per https://developer.apple.com/forums/thread/696525
@@ -400,8 +402,10 @@ public class MarkupWKWebView: WKWebView, ObservableObject {
         }
         scriptFiles += "]"
         let cssFile = userCssFile == nil ? "null" : "'\(userCssFile!)'"
-        print("MU.loadUserFiles(\(scriptFiles), \(cssFile))")
         evaluateJavaScript("MU.loadUserFiles(\(scriptFiles), \(cssFile))") { result, error in
+            if let cssTag = userCssTag{
+                
+            }
             handler?()
         }
     }

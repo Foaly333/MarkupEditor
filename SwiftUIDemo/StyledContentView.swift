@@ -126,3 +126,7 @@ extension StyledContentView: FileToolbarDelegate {
     }
 
 }
+
+#Preview{
+    StyledContentView()
+}
