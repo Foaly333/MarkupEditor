@@ -402,10 +402,8 @@ public class MarkupWKWebView: WKWebView, ObservableObject {
         }
         scriptFiles += "]"
         let cssFile = userCssFile == nil ? "null" : "'\(userCssFile!)'"
-        evaluateJavaScript("MU.loadUserFiles(\(scriptFiles), \(cssFile))") { result, error in
-            if let cssTag = userCssTag{
-                
-            }
+        let cssTag = userCssTag == nil ? "null" : "`\(userCSSTag!)`"
+        evaluateJavaScript("MU.loadUserFiles(\(scriptFiles), \(cssFile)),\(cssTag)") { result, error in
             handler?()
         }
     }
