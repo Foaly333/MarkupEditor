@@ -104,8 +104,7 @@ MU.loadUserFiles = function(scriptFiles, cssFile) {
 
 
 MU.loadUserCSSTag = function(cssTag) {
-    let result = _loadUserCSSTag(cssTag);
-    return result
+    _loadUserCSSTag(cssTag);
 };
 
 const _loadUserCSSTag = function(tag) {
@@ -115,7 +114,6 @@ const _loadUserCSSTag = function(tag) {
         style.innerHTML = tag
         head.appendChild(style);
     }
-    return document.getElementsByTagName('head')[0].innerHTML
 };
 
 const _loadUserFiles = function(scriptFiles, cssFile) {
