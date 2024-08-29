@@ -30,9 +30,17 @@ struct DemoContentView: View {
     @State private var rawShowing: Bool = false
     @State private var demoHtml: String
     
+    var config : MarkupWKWebViewConfiguration {
+        let config = MarkupWKWebViewConfiguration()
+        //config.userScriptFile = "custom.js"
+        config.userCssFile = "demoDivs.css"
+        config.userCssTag = "h1,h2,h3,h4{background-color:red;}"
+        return config
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
-            MarkupEditorView(markupDelegate: self, html: $demoHtml, id: "Document")
+            MarkupEditorView(markupDelegate: self, configuration : config, html: $demoHtml, id: "Document")
             if rawShowing {
                 VStack {
                     Divider()

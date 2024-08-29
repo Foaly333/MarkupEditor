@@ -102,16 +102,32 @@ MU.loadUserFiles = function(scriptFiles, cssFile) {
     _loadUserFiles(scriptFiles,cssFile);
 };
 
+
 MU.loadUserCSSTag = function(cssTag) {
-    _loadUserCSSTag(cssTag);
+    let result = _loadUserCSSTag(cssTag);
+    return result
 };
 
-const _loadUserFiles = function(scriptFiles, cssFile,cssTag) {
+const _loadUserCSSTag = function(tag) {
+    if(tag){
+        let head = document.getElementsByTagName('head')[0];
+        let style = document.createElement('style');
+        style.innerHTML = tag
+        head.appendChild(style);
+    }
+    return document.getElementsByTagName('head')[0].innerHTML
+};
+
+const _loadUserFiles = function(scriptFiles, cssFile) {
     if (scriptFiles.length > 0){
         const [scriptFile, ...restOfElements] = scriptFiles;
         _loadUserScriptFile(scriptFile, function() { _loadUserFiles(restOfElements,cssFile) });
     }else{
-        _loadUserCSSFile(cssFile,cssTag);
+        if (cssFile) {
+            _loadUserCSSFile(cssFile);
+        } else {
+            _loadedUserFiles();
+        }
     }
 };
 
@@ -134,26 +150,14 @@ const _loadUserScriptFile = function(file, callback) {
 /**
  * Called to load user CSS before loading html if userCSSFile has been defined for this MarkupWKWebView
  */
-const _loadUserCSSFile = function(file,tag) {
-    _loadUserCSSTag(tag)
-    if(file){
-        let head = document.getElementsByTagName('head')[0];
-        let link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        link.addEventListener('load', function() { _loadedUserFiles() });
-        link.href = file;
-        head.appendChild(link);
-    }else{
-        _loadedUserFiles()
-    }
-};
-
-const _loadUserCSSTag = function(tag) {
+const _loadUserCSSFile = function(file) {
     let head = document.getElementsByTagName('head')[0];
-    let style = document.createElement('style');
-    style.text = tag
-    head.appendChild(style);
+    let link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.addEventListener('load', function() { _loadedUserFiles() });
+    link.href = file;
+    head.appendChild(link);
 };
 
 /**
